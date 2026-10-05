@@ -1,82 +1,23 @@
 # marketing-campaign-analytics
 
-A real campaign-performance analysis project, built to demonstrate
-genuine data-cleaning and marketing-analytics engineering (conversion
-funnels, channel comparison, statistical significance testing, segment
-performance) against a real, public, well-documented campaign dataset —
-built to close a "digital marketing / campaign analytics" evidence gap
-identified against a Marketing Intelligence & Technology working-student
-posting.
+A campaign-performance analysis project covering data cleaning and marketing-analytics engineering: conversion funnels, channel comparison, statistical significance testing, and segment performance, on a real, public, well-documented campaign dataset.
 
-## What this is, precisely
+## What it does
 
-- `data/bank_marketing_raw.csv` — the real UCI "Bank Marketing" dataset
-  (Moro, Cortez & Rita, *A Data-Driven Approach to Predict the Success
-  of Bank Telemarketing*, Decision Support Systems, 2014): 41,188 real
-  outbound telemarketing campaign contacts made by a Portuguese retail
-  bank between 2008 and 2010, promoting term-deposit subscriptions.
-- `src/data_prep.py` — schema-validated loading and real data cleaning:
-  converts the `pdays == 999` sentinel into a proper
-  `previously_contacted` boolean instead of treating 999 as a literal
-  day count, builds ordered categoricals for month/day-of-week so
-  trend analysis sorts chronologically rather than alphabetically, and
-  buckets contact frequency into labeled ranges.
-- `src/analysis.py` — the actual analysis functions: conversion rate by
-  channel, by month, by day of week, by contact frequency, by prior
-  campaign outcome, by age segment; a two-proportion z-test comparing
-  the two contact channels; and a funnel summary (attempted → connected
-  → converted).
-- `run_pipeline.py` — runs the full pipeline end to end and prints a
-  real report (see "Sample output" below — copied directly from an
-  actual run, not written by hand).
-- `tests/` — 28 tests, all passing, covering both the data-cleaning
-  logic and the analysis functions, including a manual cross-check of
-  the z-test statistic against an independent calculation and checks
-  that every groupby covers all 41,188 contacts with no rows dropped.
+- `src/data_prep.py`: schema-validated loading and data cleaning. It converts the `pdays == 999` sentinel into a proper `previously_contacted` boolean instead of treating 999 as a literal day count, builds ordered categoricals for month and day of week so trend analysis sorts chronologically rather than alphabetically, and buckets contact frequency into labeled ranges.
+- `src/analysis.py`: the analysis functions: conversion rate by channel, by month, by day of week, by contact frequency, by prior campaign outcome, and by age segment; a two-proportion z-test comparing the two contact channels; and a funnel summary (attempted, connected, converted).
+- `run_pipeline.py`: runs the full pipeline end to end and prints a report (see "Results" below, copied directly from an actual run).
+- `tests/`: 28 tests, all passing, covering both the data-cleaning logic and the analysis functions, including a manual cross-check of the z-test statistic against an independent calculation and checks that every groupby covers all 41,188 contacts with no rows dropped.
 
-## Honest disclosure — what this is and isn't evidence of
+## Data
 
-**This is real public data, not DATEV's own data**, and it is outbound
-telemarketing campaign data, not web/digital-advertising analytics
-data. It was chosen deliberately: a real, genuinely messy, well-
-documented, class-imbalanced campaign dataset that could actually be
-downloaded in this environment, over a synthetic stand-in. Two more
-directly-matching public sources were tried first and found to be
-network-blocked from this environment when checked directly —
-`archive.ics.uci.edu` (the dataset's original host) and `kaggle.com`
-both failed to connect; a GitHub mirror of the identical dataset
-(`raw.githubusercontent.com`) was reachable and used instead.
+`data/bank_marketing_raw.csv` is the real UCI "Bank Marketing" dataset (Moro, Cortez & Rita, *A Data-Driven Approach to Predict the Success of Bank Telemarketing*, Decision Support Systems, 2014): 41,188 real outbound telemarketing campaign contacts made by a Portuguese retail bank between 2008 and 2010, promoting term-deposit subscriptions. It is outbound-calling campaign data rather than web advertising data, and a real, messy, class-imbalanced target makes it a good fit for campaign analytics. I loaded it from a GitHub mirror of the original dataset.
 
-**This project does not demonstrate Adobe Experience Cloud, Databricks,
-Power Automate, Power Apps, or SharePoint experience**, and makes no
-claim to. Those specific tools were checked directly for reachability
-in this sandbox (`community.cloud.databricks.com`,
-`www.databricks.com`, and the Adobe Experience Cloud login/product
-pages all failed to connect) and were confirmed genuinely not buildable
-here — this is stated directly rather than worked around by claiming
-unearned experience with them. What this project *does* demonstrate
-directly is the underlying analytical skill those tools would be used
-to apply: real data cleaning, funnel/conversion analysis, channel
-comparison with a proper significance test, and segment performance
-reporting — the same category of work, on real data, using Python/
-pandas instead of a specific enterprise platform.
+**Statistical rigor.** The channel comparison (`channel_ab_test` in `src/analysis.py`) is a two-proportion z-test rather than an eyeballed percentage difference: pooled proportion, standard error, z-statistic, and a two-sided p-value, cross-checked in the test suite against an independently written manual calculation (`test_channel_ab_test_matches_manual_z_test_calculation`).
 
-**Statistical rigor**: the channel comparison (`channel_ab_test` in
-`src/analysis.py`) is a real two-proportion z-test, not just an
-eyeballed percentage difference — pooled proportion, standard error,
-z-statistic, and a two-sided p-value, cross-checked in the test suite
-against an independently written manual calculation
-(`test_channel_ab_test_matches_manual_z_test_calculation`).
+**The `duration` column is excluded from any targeting-relevant segment.** The dataset's own documentation notes that call duration is only known *after* a call ends, so it cannot be used to decide who to call. It is reported once in the funnel summary purely as a call-connection indicator, and nowhere else, to avoid the data-leakage mistake of using a post-hoc variable as if it were predictive.
 
-**The `duration` column is deliberately excluded from any targeting-
-relevant segment.** The dataset's own documentation notes that call
-duration is only known *after* a call ends, so it can't be used to
-decide who to call — it's reported once in the funnel summary purely
-as a call-connection indicator, and nowhere else, to avoid the well-
-known data-leakage mistake of using a post-hoc variable as if it were
-predictive.
-
-## Sample output (from an actual run of `run_pipeline.py`)
+## Results (from an actual run of `run_pipeline.py`)
 
 ```
 Overall conversion rate: 11.2654%
@@ -108,7 +49,7 @@ failure          4252          605           0.1423
 nonexistent     35563         3141           0.0883
 ```
 
-Three genuine, checkable findings came out of this real data:
+Three checkable findings came out of this data:
 
 1. **Cellular contacts convert at roughly 2.8x the rate of landline
    contacts** (14.7% vs. 5.2%), and the difference is statistically
@@ -123,23 +64,37 @@ Three genuine, checkable findings came out of this real data:
    65.1%**, versus 8.8% for clients never previously contacted — a
    clear warm-audience effect.
 
-## Verification performed
+## Tests
 
-- `python3 -m pytest tests/ -v` — 28/28 tests pass.
-- `python3 run_pipeline.py` — runs end to end against the real 41,188-
-  row dataset; the "Sample output" section above is copied directly
-  from this run's actual stdout.
-- Every groupby-based analysis function is tested to confirm its
-  `contacts` column sums to the full dataset size (41,188), so no
-  analysis is silently dropping rows.
-- The z-test implementation is cross-checked in
-  `test_channel_ab_test_matches_manual_z_test_calculation` against an
-  independently written manual computation of the same statistic.
+- `python3 -m pytest tests/ -v`: 28/28 tests pass.
+- `python3 run_pipeline.py` runs end to end against the 41,188-row dataset; the "Results" section above is copied directly from this run's actual stdout.
+- Every groupby-based analysis function is tested to confirm its `contacts` column sums to the full dataset size (41,188), so no analysis silently drops rows.
+- The z-test implementation is cross-checked in `test_channel_ab_test_matches_manual_z_test_calculation` against an independently written manual computation of the same statistic.
 
-## Running it yourself
+## Project structure
+
+```
+data/bank_marketing_raw.csv
+src/
+  data_prep.py
+  analysis.py
+tests/
+  test_data_prep.py
+  test_analysis.py
+run_pipeline.py
+requirements.txt
+```
+
+## Running it
 
 ```bash
 pip install -r requirements.txt
 python3 -m pytest tests/ -v
 python3 run_pipeline.py
 ```
+
+## Possible extensions
+
+- Add a channel-by-segment breakdown (for example channel conversion by age band).
+- Apply the same funnel and significance tooling to web or digital-advertising campaign data.
+- Build a dashboard on top of the analysis functions.

@@ -8,19 +8,13 @@ dataset of 41,188 actual outbound telemarketing campaign contacts made
 by a Portuguese retail bank between 2008 and 2010, promoting term
 deposit subscriptions.
 
-Direct disclosure: this is NOT DATEV's own data, and it is not a
-digital-advertising / web-analytics dataset — it is outbound-calling
-campaign data. It was chosen because it is genuine, real-world,
-well-documented campaign-performance data that is actually reachable
-in this environment (archive.ics.uci.edu and kaggle.com were both
-network-blocked when checked directly; a GitHub mirror of the same
-dataset was reachable). It lets this project demonstrate real
-campaign-analytics engineering — conversion-rate analysis, segment
-performance, statistical comparison across channels/timing, contact-
-frequency effects on outcome — on real data with a real, imbalanced
-target class, rather than a synthetic stand-in. It does not, and is
-not claimed to, demonstrate any experience with Adobe Experience
-Cloud, Databricks, Power Automate, Power Apps, or SharePoint.
+This is outbound-calling campaign data rather than a digital-advertising /
+web-analytics dataset. It is genuine, real-world, well-documented
+campaign-performance data (loaded from a GitHub mirror of the original
+dataset), which supports campaign-analytics work — conversion-rate
+analysis, segment performance, statistical comparison across
+channels/timing, contact-frequency effects on outcome — on real data
+with a real, imbalanced target class.
 """
 
 import pandas as pd
